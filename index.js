@@ -39,16 +39,15 @@ class Customer
     this.name = name;
     this.id = ++customerId;
     // this.employerId = employer.id;
-    store.customers.push(this);
     if(employer)
     {
       this.employerId = employer.id;
     }
+    store.customers.push(this);
   }
 
   deliveries() {
     return store.deliveries.filter( function (delivery) {
-      console.log(this)
       return delivery.customerId === this.id
     }.bind(this))
 }
@@ -81,6 +80,26 @@ class Meal
     store.meals.push(this);
 
   }
+
+  deliveries () {
+    return store.deliveries.filter(function(delivery) {
+      return delivery.mealId === this.id
+    }.bind(this))
+  }
+
+  customers () {
+    return this.deliveries().map(function(delivery) {
+      return store.customers.find(function(customer) {
+        return customer.id === delivery.customerId
+      })
+    })
+  }
+
+  static byPrice () {
+    return store.meals.sort(function(meal1, meal2) {
+      return  meal2.price - meal1.price
+    })
+  }
 }
 
 class Delivery
@@ -97,6 +116,18 @@ class Delivery
     this.id = ++deliveryId;
     store.deliveries.push(this);
   }
+
+  customer() {
+    return store.customers.find(function(customer) {
+      return customer.id === this.customerId
+    }.bind(this))
+  }
+
+  meal() {
+    return store.meals.find(function(meal) {
+      return meal.id === this.mealId
+    }.bind(this))
+  }
 }
 
 class Employer
@@ -108,10 +139,30 @@ class Employer
     store.employers.push(this);
 
   }
-  // employees()
-  // {
-  //   store.deliveries.filter(
-  //     employee => this.id === employee.
-  //   )
-  // }
+
+  employees() {
+    return store.customers.filter(function(customer) {
+      return customer.employerId === this.id
+    }.bind(this))
+  }
+
+  deliveries() {
+    return this.employees().map(function(employee) {
+      return store.deliveries.find(function(delivery) {
+        return delivery.customerId === employee.id
+      })
+    })
+  }
+
+  meals () {
+
+    let newArray = this.deliveries().map(function(delivery){
+      console.log(this)
+      return store.meals.find(function(meal){
+        console.log(this)
+        return meal.id === delivery.mealId
+      })
+    })
+
+  }
 }
