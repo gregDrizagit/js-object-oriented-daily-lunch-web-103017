@@ -28,7 +28,7 @@
 let store = {customers: [], employers: [], meals: [], deliveries:[]}
 
 let customerId = 0;
-let mealsId = 0;
+let mealId = 0;
 let deliveryId = 0;
 let employerId = 0;
 class Customer
@@ -37,7 +37,6 @@ class Customer
   {
 
     this.name = name;
-    console.log(name, employer)
     this.id = ++customerId;
     // this.employerId = employer.id;
     store.customers.push(this);
@@ -47,10 +46,28 @@ class Customer
     }
   }
 
-    // totalSpent()
-    // {
-    //
-    // }
+  deliveries() {
+    return store.deliveries.filter( function (delivery) {
+      console.log(this)
+      return delivery.customerId === this.id
+    }.bind(this))
+}
+
+// Coule iterate through deliveries above instead
+  meals() {
+    return this.deliveries().map ( function (delivery) {
+      return store.meals.find ( function (meal) {
+        return meal.id === delivery.mealId
+      })
+    })
+  }
+
+  totalSpent(){
+    return this.meals().reduce(function(a, meal) {
+      return a + meal.price;
+    }, 0)
+  }
+
 }
 
 class Meal
@@ -60,7 +77,7 @@ class Meal
 
     this.title = title;
     this.price = price;
-    this.id = ++mealsId;
+    this.id = ++mealId;
     store.meals.push(this);
 
   }
@@ -70,9 +87,14 @@ class Delivery
 {
   constructor(meal, customer)
   {
-    this.mealId = meal.id;
-    this.customerId = customer.id;
-    this.deliveryId = ++deliveryId;
+    if (meal) {
+      this.mealId = meal.id;
+    }
+    if (customer) {
+      this.customerId = customer.id;
+    }
+
+    this.id = ++deliveryId;
     store.deliveries.push(this);
   }
 }
