@@ -154,15 +154,20 @@ class Employer
     })
   }
 
+// This is not working. We need to come back to this method and check it out.
   meals () {
-
-    let newArray = this.deliveries().map(function(delivery){
-      console.log(this)
+    let resultArray = []
+    this.deliveries().map(function(delivery){
       return store.meals.find(function(meal){
-        console.log(this)
-        return meal.id === delivery.mealId
+        resultArray.forEach( function (element) {
+          if (!element.id === meal.id && meal.id === delivery.mealId) {
+            resultArray.push(meal)
+          }
+        })
+
       })
     })
+    return resultArray
 
   }
 }
