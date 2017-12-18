@@ -139,6 +139,7 @@ class Employer
     store.employers.push(this);
 
   }
+// lea
 
   employees() {
     return store.customers.filter(function(customer) {
@@ -147,27 +148,59 @@ class Employer
   }
 
   deliveries() {
-    return this.employees().map(function(employee) {
-      return store.deliveries.find(function(delivery) {
+    let all =this.employees().map(function(employee) {
+      return store.deliveries.filter(function(delivery) {
         return delivery.customerId === employee.id
       })
     })
+    return [].concat.apply([], all)
   }
 
-// This is not working. We need to come back to this method and check it out.
-  meals () {
-    let resultArray = []
-    this.deliveries().map(function(delivery){
-      return store.meals.find(function(meal){
-        resultArray.forEach( function (element) {
-          if (!element.id === meal.id && meal.id === delivery.mealId) {
-            resultArray.push(meal)
-          }
-        })
 
+  meals() {
+    let result = []
+    // gets all the meals and saves it to a variable
+    let all = this.deliveries().map(function(delivery) {
+      return store.meals.find(function(meal) {
+        return delivery.mealId === meal.id
       })
     })
-    return resultArray
 
+    //checks for uniqueness
+    for (let i = 0; i < all.length-1; i++) {
+      for (let j = i + 1; j < all.length; j++) {
+        if (all[i] === all[j]) {
+          delete all[j]
+        }
+      }
+    }
+
+    //filters only truthy values after deletion above
+    return all.filter(function(element) {
+      if (element) {
+        return element
+      }
+    })
   }
+
+  mealTotals() {
+    let all = this.deliveries().map(function(delivery) {
+      return store.meals.filter(function(meal) {
+        return delivery.mealId === meal.id
+      })
+    })
+
+    let flatten = [].concat.apply([], all)
+
+    let hash = flatten.reduce(function (allMeals, meal) {
+      if (meal.id in allMeals) {
+        allMeals[meal.id]++;
+      } else {
+        allMeals[meal.id] = 1;
+      }
+      return allMeals;
+    }, {});
+    return hash
+  }
+
 }
